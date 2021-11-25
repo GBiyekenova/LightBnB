@@ -10,31 +10,12 @@ const pool = new Pool({
 });
 
 /// Users
-pool
-    .query(`SELECT * FROM users WHERE email= 'allisonjackson@mail.com'`)
-    .then((result) => {
-      console.log(result.rows)
-      return result.rows[0]}
-      )
-    .catch((err) => console.log(err))
 
 /**
  * Get a single user from the database given their email.
  * @param {String} email The email of the user.
  * @return {Promise<{}>} A promise to the user.
  */
-// const getUserWithEmail = function(email) {
-//   let user;
-//   for (const userId in users) {
-//     user = users[userId];
-//     if (user.email.toLowerCase() === email.toLowerCase()) {
-//       break;
-//     } else {
-//       user = null;
-//     }
-//   }
-//   return Promise.resolve(user);
-// }
 const getUserWithEmail = function(email) {
  return pool
     .query(`SELECT * FROM users WHERE email=$1`,[email])
@@ -90,7 +71,13 @@ exports.addUser = addUser;
  * @return {Promise<[{}]>} A promise to the reservations.
  */
 const getAllReservations = function(guest_id, limit = 10) {
-  return getAllProperties(null, 2);
+  return pool
+  .query(`SELECT * FROM reservations JOIN properties ON properties.id = property_id WHERE guest_id=$1 LIMIT $2`, [guest_id, limit])
+  .then((result) => {
+    return result.rows}
+    )
+  .catch((err) => console.log(err))
+
 }
 exports.getAllReservations = getAllReservations;
 
